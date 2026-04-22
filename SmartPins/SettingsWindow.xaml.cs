@@ -1,8 +1,10 @@
+using System.Runtime.Versioning;
 using System.Windows;
 using System.Windows.Input;
 
 namespace SmartPins
 {
+    [SupportedOSPlatform("windows")]
     public partial class SettingsWindow : Window
     {
         private string _pendingHotkey;

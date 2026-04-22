@@ -25,8 +25,8 @@ namespace SmartPins
             PinManager = new WindowPinManager();
             MouseHook = new MouseHook(PinManager);
 
-            PinManager.WindowPinned += (_, ev) => ShowBalloon("Закреплено", $"[PIN] {ev.WindowTitle}", BalloonIcon.Info);
-            PinManager.WindowUnpinned += (_, ev) => ShowBalloon("Откреплено", $"[OFF] {ev.WindowTitle}", BalloonIcon.Info);
+            PinManager.WindowPinned += (_, ev) => ShowBalloon("Pinned", $"[PIN] {ev.WindowTitle}", BalloonIcon.Info);
+            PinManager.WindowUnpinned += (_, ev) => ShowBalloon("Unpinned", $"[OFF] {ev.WindowTitle}", BalloonIcon.Info);
 
             CreateTrayIcon();
         }
@@ -77,28 +77,28 @@ namespace SmartPins
             menu.Items.Add(Separator());
 
             // ── actions ──────────────────────────────────────────────────
-            menu.Items.Add(Item(PackIconKind.Monitor, "Показать панель", "#FF39FF14", () =>
+            menu.Items.Add(Item(PackIconKind.Monitor, "Show panel", "#FF39FF14", () =>
             {
                 if (MainWindow is MainWindow mw) mw.ShowFromTray();
                 else { MainWindow?.Show(); MainWindow!.WindowState = WindowState.Normal; MainWindow.Activate(); }
             }));
 
-            menu.Items.Add(Item(PackIconKind.CursorPointer, "Закрепить курсором", "#FF00FFFF", () =>
+            menu.Items.Add(Item(PackIconKind.CursorPointer, "Pin by cursor", "#FF00FFFF", () =>
                 PinManager.IsPinMode = true));
 
-            menu.Items.Add(Item(PackIconKind.PinOff, "Открепить все", "#FFFF3B3B", () =>
+            menu.Items.Add(Item(PackIconKind.PinOff, "Unpin all", "#FFFF3B3B", () =>
                 PinManager.UnpinAllWindows()));
 
             menu.Items.Add(Separator());
 
-            menu.Items.Add(Item(PackIconKind.Cog, "Настройки", "#FF666666", () =>
+            menu.Items.Add(Item(PackIconKind.Cog, "Settings", "#FF666666", () =>
             {
                 if (MainWindow is MainWindow mw) { mw.ShowFromTray(); mw.OpenSettings(); }
             }));
 
             menu.Items.Add(Separator());
 
-            menu.Items.Add(Item(PackIconKind.ExitToApp, "Выход", "#FF666666", Shutdown));
+            menu.Items.Add(Item(PackIconKind.ExitToApp, "Exit", "#FF666666", Shutdown));
 
             _trayIcon.ContextMenu = menu;
             _trayIcon.TrayMouseDoubleClick += (_, _) =>

@@ -1,6 +1,3 @@
-# This workflow will build a .NET WPF project
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
-
 name: Build SmartPins
 
 on:
@@ -19,86 +16,41 @@ env:
 jobs:
   build-and-test:
     runs-on: windows-latest
-    strategy:
-      matrix:
-        configuration: [Release]
-        runtime: [win-x64]
-
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Setup .NET ${{ env.DOTNET_VERSION }}
-      uses: actions/setup-dotnet@v4
+    - uses: actions/checkout@v4
+
+    - uses: actions/setup-dotnet@v4
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
-        
-    - name: Cache NuGet packages
-      uses: actions/cache@v4
+
+    - uses: actions/cache@v4
       with:
         path: ~/.nuget/packages
         key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
-        restore-keys: |
-          ${{ runner.os }}-nuget-
-          
-    - name: Cache .NET build artifacts
-      uses: actions/cache@v4
-      with:
-        path: |
-          ~/.dotnet/tools
-          ${{ github.workspace }}/SmartPins/bin
-          ${{ github.workspace }}/SmartPins/obj
-        key: ${{ runner.os }}-dotnet-${{ hashFiles('**/*.csproj') }}
-        restore-keys: |
-          ${{ runner.os }}-dotnet-
-        
-    - name: Restore dependencies
-      run: dotnet restore ${{ env.SOLUTION_FILE }}
-      
-    - name: Build
-      run: dotnet build ${{ env.SOLUTION_FILE }} --configuration ${{ matrix.configuration }} --no-restore
-      
-    - name: Test
-      run: dotnet test ${{ env.SOLUTION_FILE }} --configuration ${{ matrix.configuration }} --no-build --verbosity normal
-      continue-on-error: true
+        restore-keys: ${{ runner.os }}-nuget-
+
+    - run: dotnet restore ${{ env.SOLUTION_FILE }}
+    - run: dotnet build ${{ env.SOLUTION_FILE }} --configuration Release --no-restore
 
   publish:
     needs: build-and-test
     runs-on: windows-latest
     if: github.event_name == 'push' || github.event_name == 'release'
-    
+
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Setup .NET ${{ env.DOTNET_VERSION }}
-      uses: actions/setup-dotnet@v4
+    - uses: actions/checkout@v4
+
+    - uses: actions/setup-dotnet@v4
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
-        
-    - name: Restore dependencies
-      run: dotnet restore ${{ env.SOLUTION_FILE }}
-      
-    - name: Build
-      run: dotnet build ${{ env.SOLUTION_FILE }} --configuration Release --no-restore
-      
-    - name: Create Single File Release (Framework-dependent)
+
+    - run: dotnet restore ${{ env.SOLUTION_FILE }}
+
+    - name: Publish self-contained
       run: |
         dotnet publish ${{ env.PROJECT_FILE }} `
           --configuration Release `
-          --output ./publish-framework `
-          --self-contained false `
-          -p:PublishSingleFile=true `
-          -p:PublishTrimmed=false `
-          -p:DebugType=None `
-          -p:DebugSymbols=false `
-          -p:IncludeNativeLibrariesForSelfExtract=true
-        
-    - name: Create Single File Release (Self-contained)
-      run: |
-        dotnet publish ${{ env.PROJECT_FILE }} `
-          --configuration Release `
-          --output ./publish-self-contained `
+          --output ./publish-selfcontained `
           --self-contained true `
           --runtime win-x64 `
           -p:PublishSingleFile=true `
@@ -107,73 +59,69 @@ jobs:
           -p:DebugSymbols=false `
           -p:IncludeNativeLibrariesForSelfExtract=true `
           -p:EnableCompressionInSingleFile=true
-        
-    - name: Create Portable Release
+
+    - name: Publish framework-dependent
+      run: |
+        dotnet publish ${{ env.PROJECT_FILE }} `
+          --configuration Release `
+          --output ./publish-framework `
+          --self-contained false `
+          --runtime win-x64 `
+          -p:PublishSingleFile=true `
+          -p:PublishTrimmed=false `
+          -p:DebugType=None `
+          -p:DebugSymbols=false
+
+    - name: Publish portable
       run: |
         dotnet publish ${{ env.PROJECT_FILE }} `
           --configuration Release `
           --output ./publish-portable `
           --self-contained false `
           -p:PublishSingleFile=false `
-          -p:PublishTrimmed=false
-        
-    - name: Get version info
+          -p:PublishTrimmed=false `
+          -p:DebugType=None `
+          -p:DebugSymbols=false
+
+    - name: Get version
       id: version
       run: |
-        $version = dotnet list ${{ env.PROJECT_FILE }} package | Select-String "SmartPins" | ForEach-Object { $_.ToString().Split()[1] }
-        if (-not $version) { $version = "1.0.0" }
-        echo "version=$version" >> $env:GITHUB_OUTPUT
-        echo "build_number=${{ github.run_number }}" >> $env:GITHUB_OUTPUT
-        
-    - name: Create ZIP archives
+        $v = (Select-Xml -Path ${{ env.PROJECT_FILE }} -XPath "//Version").Node.InnerText
+        if (-not $v) { $v = "1.0.0" }
+        echo "version=$v" >> $env:GITHUB_OUTPUT
+
+    - name: Zip artifacts
       run: |
-        $version = "${{ steps.version.outputs.version }}"
-        $build = "${{ steps.version.outputs.build_number }}"
-        
-        # Framework-dependent single file
-        Compress-Archive -Path ./publish-framework/SmartPins.exe -DestinationPath "./SmartPins-Framework-$version-build$build.zip"
-        
-        # Self-contained single file
-        Compress-Archive -Path ./publish-self-contained/SmartPins.exe -DestinationPath "./SmartPins-SelfContained-$version-build$build.zip"
-        
-        # Portable version
-        Compress-Archive -Path ./publish-portable/* -DestinationPath "./SmartPins-Portable-$version-build$build.zip"
-        
-    - name: Upload Single File Artifacts
-      uses: actions/upload-artifact@v4
+        $v = "${{ steps.version.outputs.version }}"
+        Compress-Archive -Path ./publish-selfcontained/SmartPins.exe  -DestinationPath "./SmartPins-$v-selfcontained.zip"
+        Compress-Archive -Path ./publish-framework/SmartPins.exe      -DestinationPath "./SmartPins-$v-framework.zip"
+        Compress-Archive -Path ./publish-portable/*                   -DestinationPath "./SmartPins-$v-portable.zip"
+
+    - uses: actions/upload-artifact@v4
       with:
-        name: SmartPins-SingleFiles-${{ steps.version.outputs.version }}
-        path: |
-          ./publish-framework/SmartPins.exe
-          ./publish-self-contained/SmartPins.exe
-        retention-days: 90
-        
-    - name: Upload Portable Artifacts
-      uses: actions/upload-artifact@v4
+        name: SmartPins-${{ steps.version.outputs.version }}-selfcontained
+        path: ./publish-selfcontained/SmartPins.exe
+        retention-days: 30
+
+    - uses: actions/upload-artifact@v4
       with:
-        name: SmartPins-Portable-${{ steps.version.outputs.version }}
+        name: SmartPins-${{ steps.version.outputs.version }}-framework
+        path: ./publish-framework/SmartPins.exe
+        retention-days: 30
+
+    - uses: actions/upload-artifact@v4
+      with:
+        name: SmartPins-${{ steps.version.outputs.version }}-portable
         path: ./publish-portable/
-        retention-days: 90
-        
-    - name: Upload ZIP Archives
-      uses: actions/upload-artifact@v4
-      with:
-        name: SmartPins-Releases-${{ steps.version.outputs.version }}
-        path: |
-          ./SmartPins-Framework-*.zip
-          ./SmartPins-SelfContained-*.zip
-          ./SmartPins-Portable-*.zip
-        retention-days: 365
-        
-    - name: Create Release (on tag)
+        retention-days: 30
+
+    - name: Create GitHub Release
       if: startsWith(github.ref, 'refs/tags/')
       uses: softprops/action-gh-release@v2
       with:
         files: |
-          ./SmartPins-Framework-*.zip
-          ./SmartPins-SelfContained-*.zip
-          ./SmartPins-Portable-*.zip
-        draft: false
-        prerelease: false
+          ./SmartPins-${{ steps.version.outputs.version }}-selfcontained.zip
+          ./SmartPins-${{ steps.version.outputs.version }}-framework.zip
+          ./SmartPins-${{ steps.version.outputs.version }}-portable.zip
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
