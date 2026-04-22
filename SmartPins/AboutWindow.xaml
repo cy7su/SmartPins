@@ -1,0 +1,90 @@
+<Window x:Class="SmartPins.AboutWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        Title="О программе" Height="320" Width="400"
+        WindowStartupLocation="CenterScreen"
+        Background="Transparent"
+        FontFamily="{DynamicResource MaterialDesignFont}"
+        AllowsTransparency="True"
+        WindowStyle="None"
+        ResizeMode="NoResize">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <materialDesign:BundledTheme BaseTheme="Dark" PrimaryColor="Blue" SecondaryColor="LightBlue" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            
+            <!-- Темный стиль для кнопки закрытия -->
+            <Style x:Key="DarkCloseButtonStyle" TargetType="Button" BasedOn="{StaticResource MaterialDesignOutlinedButton}">
+                <Setter Property="Background" Value="Transparent"/>
+                <Setter Property="Foreground" Value="#FFE0E0E0"/>
+                <Setter Property="BorderBrush" Value="#FF404040"/>
+                <Setter Property="BorderThickness" Value="1"/>
+                <Setter Property="Padding" Value="16,8"/>
+                <Setter Property="FontWeight" Value="Medium"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Border Background="{TemplateBinding Background}"
+                                    CornerRadius="24"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    BorderBrush="{TemplateBinding BorderBrush}">
+                                <ContentPresenter HorizontalAlignment="Center" 
+                                                VerticalAlignment="Center"
+                                                Margin="{TemplateBinding Padding}"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Background" Value="#FF353535"/>
+                                    <Setter Property="BorderBrush" Value="#FF0078D4"/>
+                                </Trigger>
+                                <Trigger Property="IsPressed" Value="True">
+                                    <Setter Property="Background" Value="#FF404040"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+        </ResourceDictionary>
+    </Window.Resources>
+    <Border CornerRadius="12" Background="#FF202020" BorderBrush="#FF404040" BorderThickness="1">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <!-- Заголовок -->
+            <Border Grid.Row="0" Background="#FF2B2B2B" CornerRadius="12,12,0,0" BorderBrush="#FF404040" BorderThickness="0,0,0,1">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="20,12,20,12">
+                        <materialDesign:PackIcon Kind="Information" Width="20" Height="20" Margin="0,0,12,0" Foreground="#FF0078D4"/>
+                        <TextBlock Text="О программе" FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center" Foreground="#FFE0E0E0"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+            <!-- Контент -->
+            <StackPanel Grid.Row="1" Margin="20,20,20,20" VerticalAlignment="Center" HorizontalAlignment="Center">
+                <TextBlock Text="SmartPins" FontSize="20" FontWeight="Bold" Foreground="#FFE0E0E0" HorizontalAlignment="Center" Margin="0,0,0,8"/>
+                <TextBlock Text="Версия 0.3" FontSize="14" Foreground="#FFAAAAAA" HorizontalAlignment="Center" Margin="0,0,0,8"/>
+                <TextBlock Text="Автор: snow" FontSize="14" Foreground="#FFAAAAAA" HorizontalAlignment="Center" Margin="0,0,0,24"/>
+                <Button Content="Закрыть"
+                        Width="180"
+                        Height="48"
+                        Style="{StaticResource DarkCloseButtonStyle}"
+                        Click="CloseButton_Click"
+                        HorizontalAlignment="Center"
+                        Margin="0,16,0,0"
+                        FontSize="18"
+                        FontWeight="SemiBold"
+                        Padding="0">
+                </Button>
+            </StackPanel>
+        </Grid>
+    </Border>
+</Window> 

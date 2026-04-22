@@ -1,0 +1,42 @@
+﻿Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36212.18
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartPins", "SmartPins\SmartPins.csproj", "{396F3BEF-B971-48DB-8F6C-FC13E3D7ADFB}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{396F3BEF-B971-48DB-8F6C-FC13E3D7ADFB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{396F3BEF-B971-48DB-8F6C-FC13E3D7ADFB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{396F3BEF-B971-48DB-8F6C-FC13E3D7ADFB}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{396F3BEF-B971-48DB-8F6C-FC13E3D7ADFB}.Debug|x64.Build.0 = Debug|Any CPU
+		{396F3BEF-B971-48DB-8F6C-FC13E3D7ADFB}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{396F3BEF-B971-48DB-8F6C-FC13E3D7ADFB}.Debug|x86.Build.0 = Debug|Any CPU
+		{396F3BEF-B971-48DB-8F6C-FC13E3D7ADFB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{396F3BEF-B971-48DB-8F6C-FC13E3D7ADFB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{396F3BEF-B971-48DB-8F6C-FC13E3D7ADFB}.Release|x64.ActiveCfg = Release|Any CPU
+		{396F3BEF-B971-48DB-8F6C-FC13E3D7ADFB}.Release|x64.Build.0 = Release|Any CPU
+		{396F3BEF-B971-48DB-8F6C-FC13E3D7ADFB}.Release|x86.ActiveCfg = Release|Any CPU
+		{396F3BEF-B971-48DB-8F6C-FC13E3D7ADFB}.Release|x86.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D172E66E-D751-4F03-B0A5-937BF8D9CFF6}
+	EndGlobalSection
+	GlobalSection(Performance) = preSolution
+		HasPerformanceSessions = true
+	EndGlobalSection
+	GlobalSection(TestCaseManagement) = preSolution
+		CategoryFile = SmartPins.vsmdi
+	EndGlobalSection
+EndGlobal
